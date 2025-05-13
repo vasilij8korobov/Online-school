@@ -1,0 +1,24 @@
+[
+  {
+    "model": "materials.lesson",
+    "pk": 1,
+    "fields": {
+      "name": "Введение в Python",
+      "description": "Основы синтаксиса Python",
+      "preview": "images/lesson_previews/python_intro.jpg",
+      "video_link": "https://youtube.com/python_intro",
+      "course": 1
+    }
+  },
+  {
+    "model": "materials.lesson",
+    "pk": 2,
+    "fields": {
+      "name": "Установка Django",
+      "description": "Как установить и настроить Django",
+      "preview": "images/lesson_previews/django_setup.jpg",
+      "video_link": "https://youtube.com/django_setup",
+      "course": 2
+    }
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "model": "users.customuser",
+    "pk": 1,
+    "fields": {
+      "username": "admin",
+      "password": "pbkdf2_sha256$600000$X5H5J5vZ5e5R5t5W5b5Q$...",
+      "last_login": null,
+      "is_superuser": true,
+      "email": "admin@school.ru",
+      "is_staff": true,
+      "is_active": true,
+      "phone": "+79991234567",
+      "city": "Москва",
+      "avatar": "images/avatars/admin.jpg"
+    }
+  },
+  {
+    "model": "users.customuser",
+    "pk": 2,
+    "fields": {
+      "username": "student",
+      "password": "pbkdf2_sha256$600000$a5b5c5d5e5f5g5h5i5j$...",
+      "last_login": null,
+      "is_superuser": false,
+      "email": "student@school.ru",
+      "is_staff": false,
+      "is_active": true,
+      "phone": "+79998765432",
+      "city": "Санкт-Петербург",
+      "avatar": "images/avatars/student.jpg"
+    }
+  }
+]
