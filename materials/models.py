@@ -94,8 +94,7 @@ class Subscription(models.Model):
         related_name='user_subscriptions',
         verbose_name='Курс')
     subscribed_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Дата подписки')
+        auto_now_add=True, verbose_name='Дата подписки')
 
     class Meta:
         unique_together = ('user', 'course')  # Одна подписка на пользователя и курс
