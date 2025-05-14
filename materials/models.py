@@ -25,6 +25,11 @@ class Course(models.Model):
         related_name='courses'
     )
 
+    materials_link = models.URLField(
+        **NULLABLE,
+        verbose_name="Ссылка на материалы курса"
+    )
+
     def __str__(self):
         return self.name
 
@@ -64,9 +69,29 @@ class Lesson(models.Model):
         related_name='lessons'
     )
 
+    materials_link = models.URLField(
+        **NULLABLE,
+        verbose_name="Ссылка на материалы урока"
+    )
+
     def __str__(self):
         return self.name
 
     class Meta:
         verbose_name = 'Урок'
         verbose_name_plural = 'Уроки'
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='course_subscriptions', verbose_name='Пользователь')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='user_subscriptions', verbose_name='Курс')
+    subscribed_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата подписки')
+
+    class Meta:
+        unique_together = ('user', 'course')  # Одна подписка на пользователя и курс
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        ordering = ['-subscribed_at']
+
+    def __str__(self):
+        return f'{self.user.email} подписан на {self.course}'   # type: ignore
