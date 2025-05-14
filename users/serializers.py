@@ -32,3 +32,5 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             password=make_password(validated_data['password'])
         )
         return user
+
+
