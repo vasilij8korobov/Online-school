@@ -1,8 +1,6 @@
 from django.urls import reverse
 from rest_framework import status, serializers
 from rest_framework.test import APITestCase
-from rest_framework.authtoken.models import Token
-
 from users.models import CustomUser as User
 from django.contrib.auth.models import Group
 from materials.models import Course, Lesson, Subscription
