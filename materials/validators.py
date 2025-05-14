@@ -10,9 +10,9 @@ class YouTubeLinkValidator:
         self.field = field
 
     def __call__(self, value):
-        if value:  # Проверяем только если значение не пустое
-            parsed_url = urlparse(value)
-            if parsed_url.netloc not in ['www.youtube.com', 'youtube.com', 'youtu.be']:
-                raise serializers.ValidationError(
-                    f"Ссылка в поле '{self.field}' должна вести на youtube.com"
-                )
+        if isinstance(value, dict) and self.field in value:
+            url = value[self.field]
+            if url:  # Проверяем только если URL не пустой
+                parsed_url = urlparse(url)
+                if parsed_url.netloc not in ['www.youtube.com', 'youtu.be']:
+                    raise serializers.ValidationError("Разрешены только ссылки на YouTube")

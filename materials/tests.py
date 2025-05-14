@@ -27,12 +27,12 @@ class YouTubeValidatorTestCase(APITestCase):
     def test_invalid_youtube_link(self):
         validator = YouTubeLinkValidator(field='video_link')
         with self.assertRaises(serializers.ValidationError):
-            validator(self.invalid_link)
+            validator({'video_link': self.invalid_link})
 
     def test_empty_link(self):
         validator = YouTubeLinkValidator(field='video_link')
         try:
-            validator(self.empty_link)
+            validator({'video_link': self.empty_link})
         except serializers.ValidationError:
             self.fail("Валидатор не должен проверять пустые ссылки")
 
@@ -61,15 +61,23 @@ class LessonTestCase(APITestCase):
             owner=self.user
         )
 
+        # Создаем тестовый курс
+        self.lesson_data = {
+            'name': 'Test Lesson',  # используйте 'name' вместо 'title'
+            'description': 'Test description',
+            'video_link': 'https://youtube.com/valid',
+            'course': self.course.id
+        }
+
         # Тестовые данные
         self.valid_data = {
-            'title': 'Valid Lesson',
+            'name': 'Valid Lesson',
             'video_link': 'https://youtu.be/dQw4w9WgXcQ',
             'description': 'Valid description',
             'course': self.course.id
         }
         self.invalid_data = {
-            'title': 'Invalid Lesson',
+            'name': 'Invalid Lesson',
             'video_link': 'https://example.com/video',
             'course': self.course.id
         }
@@ -83,7 +91,7 @@ class LessonTestCase(APITestCase):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Lesson.objects.filter(title='Valid Lesson').exists())
+        self.assertTrue(Lesson.objects.filter(name='Valid Lesson').exists())
 
     def test_create_lesson_unauthenticated(self):
         """Неавторизованный пользователь не может создать урок"""
@@ -103,29 +111,31 @@ class LessonTestCase(APITestCase):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('video_link', response.json())
+        self.assertIn('non_field_errors', response.json())
+        self.assertEqual(response.json()['non_field_errors'][0], 'Разрешены только ссылки на YouTube')
 
     def test_update_lesson_as_owner(self):
         """Владелец может обновить урок"""
         lesson = Lesson.objects.create(
-            title='Test Lesson',
+            name='Test Lesson',
             course=self.course,
-            owner=self.user
+            owner=self.user,
+            video_link='https://youtube.com/valid'
         )
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(
             reverse('lessons-detail', args=[lesson.id]),
-            {'title': 'Updated Lesson'},
+            {'name': 'Updated Lesson'},
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         lesson.refresh_from_db()
-        self.assertEqual(lesson.title, 'Updated Lesson')
+        self.assertEqual(lesson.name, 'Updated Lesson')
 
     def test_delete_lesson_as_moderator(self):
         """Модератор может удалить урок"""
         lesson = Lesson.objects.create(
-            title='Test Lesson',
+            name='Test Lesson',
             course=self.course,
             owner=self.user
         )
