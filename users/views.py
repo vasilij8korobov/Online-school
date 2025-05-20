@@ -1,13 +1,19 @@
 from datetime import date
 
+from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, generics, permissions
+from rest_framework import viewsets, generics, permissions, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from config.services.stripe_service import create_stripe_product, create_stripe_price, create_stripe_checkout_session
+from materials.models import Course
 from users.filters import PaymentFilter
 from users.models import Payment, CustomUser
 from users.permissions import IsAdminOrOwner
-from users.serializers import PaymentSerializer, UserSerializer, UserRegisterSerializer
+from users.serializers import PaymentSerializer, UserSerializer, UserRegisterSerializer, StripePaymentResponseSerializer
 
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 
@@ -86,7 +92,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
     @extend_schema(
-        exclude=True  # Скрываем стандартные методы, если не хотим их документировать
+        exclude=True
     )
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
@@ -179,3 +185,117 @@ class RegisterView(generics.CreateAPIView):
 )
 class CustomTokenObtainPairView(TokenObtainPairView):
     permission_classes = [permissions.AllowAny]
+
+
+@extend_schema(
+    tags=['Платежи'],
+    description='Создание платежа через Stripe'
+)
+class StripePaymentCreateAPIView(APIView):
+    """Создание платежной сессии Stripe для курса"""
+    permission_classes = [IsAuthenticated]
+    serializer_class = StripePaymentResponseSerializer
+
+    @extend_schema(
+        summary='Создать платеж Stripe',
+        responses={
+            201: {
+                'description': 'Ссылка для оплаты',
+                'content': {
+                    'application/json': {
+                        'example': {
+                            'payment_id': 1,
+                            'payment_link': 'https://checkout.stripe.com/pay/...'
+                        }
+                    }
+                }
+            },
+            404: {'description': 'Курс не найден'},
+            400: {'description': 'Ошибка создания платежа'}
+        }
+    )
+    def post(self, request, course_id):
+        try:
+            course = Course.objects.get(id=course_id)
+
+            # Создаем продукт в Stripe
+            product = create_stripe_product(
+                name=f'Курс: {course.name}',
+                description=course.description[:500]
+            )
+
+            # Создаем цену в Stripe (умножаем на 100 для перевода в копейки)
+            price = create_stripe_price(
+                product_id=product.id,
+                amount=course.price * 100 if course.price else 0
+            )
+
+            # URL для редиректа после оплаты
+            success_url = request.build_absolute_uri(
+                reverse('payment-success') + f'?session_id={{CHECKOUT_SESSION_ID}}'
+            )
+            cancel_url = request.build_absolute_uri(
+                reverse('payment-cancel')
+            )
+
+            # Создаем сессию оплаты в Stripe
+            session = create_stripe_checkout_session(
+                price_id=price.id,
+                success_url=success_url,
+                cancel_url=cancel_url
+            )
+
+            # Сохраняем платеж в БД
+            payment = Payment.objects.create(
+                user=request.user,
+                paid_course=course,
+                amount=course.price,
+                payment_method='stripe',
+                stripe_product_id=product.id,
+                stripe_price_id=price.id,
+                stripe_session_id=session.id,
+                stripe_payment_link=session.url
+            )
+
+            return Response({
+                'payment_id': payment.id,
+                'payment_link': session.url
+            }, status=status.HTTP_201_CREATED)
+
+        except Course.DoesNotExist:
+            return Response(
+                {'error': 'Курс не найден'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class PaymentSuccessAPIView(APIView):
+    """Обработка успешной оплаты"""
+
+    def get(self, request):
+        session_id = request.GET.get('session_id')
+        if session_id:
+            try:
+                payment = Payment.objects.get(stripe_session_id=session_id)
+                payment.is_paid = True
+                payment.stripe_payment_status = 'paid'
+                payment.save()
+                return Response({'status': 'Payment successful'})
+            except Payment.DoesNotExist:
+                pass
+        return Response({'status': 'Payment processed'})
+
+
+class PaymentCancelAPIView(APIView):
+    """Обработка отмены оплаты"""
+
+    def get(self, request):
+        return Response(
+            {'status': 'Payment can be paid later'},
+            status=status.HTTP_200_OK
+        )

@@ -22,6 +22,9 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = '__all__'
+        extra_kwargs = {
+            'name': {'help_text': 'Название курса'},
+        }
         validators = [
             YouTubeLinkValidator(field='materials_link')
         ]

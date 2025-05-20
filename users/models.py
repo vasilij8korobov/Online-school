@@ -56,6 +56,7 @@ class Payment(models.Model):
     PAYMENT_METHOD_CHOICES = [
         ('cash', 'Наличные'),
         ('transfer', 'Перевод на счёт'),
+        ('stripe', 'Stripe'),
     ]
 
     user = models.ForeignKey(
@@ -89,6 +90,37 @@ class Payment(models.Model):
         max_length=10,
         choices=PAYMENT_METHOD_CHOICES,
         verbose_name='Способ оплаты'
+    )
+
+    # Новые поля для Stripe
+    stripe_product_id = models.CharField(
+        max_length=100,
+        **NULLABLE,
+        verbose_name='ID продукта в Stripe'
+    )
+    stripe_price_id = models.CharField(
+        max_length=100,
+        **NULLABLE,
+        verbose_name='ID цены в Stripe'
+    )
+    stripe_session_id = models.CharField(
+        max_length=100,
+        **NULLABLE,
+        verbose_name='ID сессии в Stripe'
+    )
+    stripe_payment_link = models.URLField(
+        max_length=512,
+        **NULLABLE,
+        verbose_name='Ссылка на оплату Stripe'
+    )
+    is_paid = models.BooleanField(
+        default=False,
+        verbose_name='Оплачено'
+    )
+    stripe_payment_status = models.CharField(
+        max_length=20,
+        **NULLABLE,
+        verbose_name='Статус платежа в Stripe'
     )
 
     def __str__(self):

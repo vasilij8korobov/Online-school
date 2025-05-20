@@ -13,6 +13,7 @@ from users.permissions import IsModerator, IsOwner
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 
 
+@extend_schema(tags=['Курсы'])
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.annotate(
         lessons_count=models.Count('lessons')).prefetch_related('lessons')
@@ -79,6 +80,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         return super().create(request, *args, **kwargs)
 
 
+@extend_schema(tags=['Уроки'])
 class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
