@@ -1,0 +1,12 @@
+### Авторизация
+POST http://localhost:8000/token/
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "yourpassword"
+}
+
+### Получить список платежей
+GET http://localhost:8000/payments/
+Authorization: Bearer {{access_token}}
