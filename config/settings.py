@@ -13,6 +13,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
+import environ
 
 load_dotenv(override=True)
 
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'rest_framework_simplejwt',
+    'drf_spectacular',
 
     'users',
     'materials',
@@ -142,9 +144,41 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Online School API',
+    'DESCRIPTION': 'API для платформы онлайн-образования',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'TAGS': [
+        {
+            'name': 'Курсы',
+            'description': 'Работа с учебными курсами',
+        },
+        {
+            'name': 'Уроки',
+            'description': 'Управление уроками курсов',
+        },
+        {
+            'name': 'Платежи',
+            'description': 'Оплата курсов через Stripe',
+        },
+        {
+            'name': 'Аутентификация',
+            'description': 'Регистрация и авторизация пользователей',
+        },
+    ],
+}
+
+STRIPE_API_KEY = os.getenv('STRIPE_API_KEY')
+if not STRIPE_API_KEY:
+    raise ValueError("STRIPE_API_KEY не найден в переменных окружения")
+STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
