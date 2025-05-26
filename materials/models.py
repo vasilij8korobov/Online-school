@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from DRY import NULLABLE
 from django.conf import settings
@@ -29,6 +30,16 @@ class Course(models.Model):
         **NULLABLE,
         verbose_name="Ссылка на материалы курса"
     )
+
+    last_updated = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.last_updated:
+            self.last_updated = timezone.now()
+        super(Course, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
