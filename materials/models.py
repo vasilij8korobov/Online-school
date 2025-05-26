@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 from DRY import NULLABLE
-from django.conf import settings
+from config import settings
 
 
 class Course(models.Model):
