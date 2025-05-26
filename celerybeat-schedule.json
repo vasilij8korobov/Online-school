@@ -1,0 +1,10 @@
+{
+    "my_periodic_task": {
+        "task": "materials.tasks.my_periodic_task",
+        "schedule": 30.0
+    },
+    "another_periodic_task": {
+        "task": "materials.tasks.another_periodic_task",
+        "schedule": 3600.0
+    }
+}
