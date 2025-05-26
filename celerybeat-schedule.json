@@ -6,5 +6,9 @@
     "another_periodic_task": {
         "task": "materials.tasks.another_periodic_task",
         "schedule": 3600.0
+    },
+    "deactivate_inactive_users": {
+        "task": "users.tasks.deactivate_inactive_users",
+        "schedule": 86400.0
     }
 }
