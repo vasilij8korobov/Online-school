@@ -1,5 +1,7 @@
+
 from django.db import models
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -9,6 +11,7 @@ from .models import Course, Lesson, Subscription
 from .serializers import CourseSerializer, LessonSerializer
 from .paginators import CoursePagination, LessonPagination  # Импортируем классы пагинации
 from users.permissions import IsModerator, IsOwner
+from .tasks import send_update_notification
 
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 
@@ -39,6 +42,16 @@ class CourseViewSet(viewsets.ModelViewSet):
         if self.request.user.is_staff or self.request.user.groups.filter(name='moderators').exists():
             return super().get_queryset()
         return Course.objects.filter(owner=self.request.user)
+
+    def perform_update(self, serializer):
+        """Обновление курса и отправка уведомлений подписчикам"""
+        course = self.get_object()
+        # Проверка на время последнего обновления
+        if not course.last_updated or (timezone.now() - course.last_updated).total_seconds() > 14400:
+            course.last_updated = timezone.now()
+            course.save()
+            send_update_notification.delay(course.id)  # Вызов задачи Celery
+        serializer.save()
 
     @extend_schema(
         summary='Список курсов',
