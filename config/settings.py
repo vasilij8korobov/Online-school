@@ -14,7 +14,6 @@ import sys
 from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
-import environ
 
 load_dotenv(override=True)
 
