@@ -1,11 +1,9 @@
 from django.contrib import admin
 from .models import Course, Lesson, Subscription
-from users.models import CustomUser
 from django.utils import timezone
 from .tasks import send_update_notification
 
 
-admin.site.register(CustomUser)
 
 
 @admin.register(Course)
