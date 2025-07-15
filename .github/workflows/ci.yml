@@ -84,14 +84,16 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Deploy to server
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          sed -i 's/\\n/\n/g' ~/.ssh/id_rsa
+          sed -i '/^$/d' ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_rsa
-    
+
+      - name: Deploy to server
+        run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/myapp:${{ github.sha }}
           docker stop myapp || true
