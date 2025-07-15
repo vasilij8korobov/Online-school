@@ -86,7 +86,7 @@ jobs:
 
     - name: Deploy to server
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
         docker pull ${{ secrets.DOCKERHUB_USERNAME }}/myapp:${{ github.sha }}
         docker stop myapp || true
         docker rm myapp || true
