@@ -4,8 +4,6 @@ from django.utils import timezone
 from .tasks import send_update_notification
 
 
-
-
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner', 'last_updated', 'preview_display')
