@@ -232,7 +232,7 @@ class StripePaymentCreateAPIView(APIView):
 
             # URL для редиректа после оплаты
             success_url = request.build_absolute_uri(
-                reverse('payment-success') + f'?session_id={{CHECKOUT_SESSION_ID}}'
+                reverse('payment-success') + '?session_id={{CHECKOUT_SESSION_ID}}'
             )
             cancel_url = request.build_absolute_uri(
                 reverse('payment-cancel')

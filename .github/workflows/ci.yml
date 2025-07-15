@@ -51,6 +51,9 @@ jobs:
 #        run: python manage.py migrate
 
       - name: Run tests
+        env:
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
         run: python manage.py test
 
   build:
