@@ -82,17 +82,17 @@ jobs:
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.SSH_USER }}
+          ssh-private-key: ${{ secrets.SSH_KEY }}
 
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_USER }}" > ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
       - name: Deploy to server
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ 127.0.0.1 }} "
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@127.0.0.1 "
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }}
           docker stop Online-school || true
           docker rm Online-school || true
