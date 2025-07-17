@@ -98,5 +98,5 @@ jobs:
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }}
           docker stop Online-school || true
           docker rm Online-school || true
-          docker run -d --name Online-school -p 80:8000 ${{ secrets.DOCKERHUB_USERNAME }}/myapp:${{ github.sha }}
+          docker run -d --name Online-school -p 80:8000 ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }}
           "
