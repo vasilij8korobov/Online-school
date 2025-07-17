@@ -94,7 +94,7 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }}
           docker stop Online-school || true
           docker rm Online-school || true
