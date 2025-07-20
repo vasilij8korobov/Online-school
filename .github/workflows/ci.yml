@@ -85,17 +85,20 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+
 
       - name: Deploy to server
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@127.0.0.1 
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }}
-          docker stop Online-school || true
-          docker rm Online-school || true
-          docker run -d --name Online-school -p 80:8000 ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }}
+          rsync -avzr -e "ssh -o StrictHostKeyChecking=no" --exclude 'pycache' --exclude '.git' --exclude '.gitignore' --exclude '.env.sample' ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.DEPLOY_DIR }}
+      - name: Install dependencies on server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} < 'EOF'
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }}
+            docker stop Online-school || true
+            docker rm Online-school || true
+            docker run -d --name Online-school 
+          EOF
           
