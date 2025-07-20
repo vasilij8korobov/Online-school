@@ -70,10 +70,10 @@ jobs:
         run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }} .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/online-school:${{ github.sha }} .
 
       - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }}
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/online-school:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -95,12 +95,12 @@ jobs:
       - name: Install dependencies on server
         run: |
           ssh -o StrictHostKeyChecking=no -vT ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }}
-          docker stop Online-school || true
-          docker rm Online-school || true
-          docker run -d --name Online-school \
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/online-school:${{ github.sha }}
+          docker stop online-school || true
+          docker rm online-school || true
+          docker run -d --name online-school \
             -p 80:8000 \
             -e "ENV_VAR=value" \
-            ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/online-school:${{ github.sha }}
           EOF
           
