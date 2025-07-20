@@ -90,15 +90,8 @@ jobs:
 
 
 
-      - name: Deploy to server
-        run: |
-          rsync -avz \
-          -e "ssh -o StrictHostKeyChecking=no" \
-          --exclude '__pycache__' \
-          --exclude '.git' \
-          --exclude '.gitignore' \
-          --exclude '.env.sample' \
-          :${{ secrets.DEPLOY_DIR }}
+
+
       - name: Install dependencies on server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} < 'EOF'
