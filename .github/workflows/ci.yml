@@ -94,7 +94,7 @@ jobs:
 
       - name: Install dependencies on server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -vT ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/Online-school:${{ github.sha }}
           docker stop Online-school || true
           docker rm Online-school || true
