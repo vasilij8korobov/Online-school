@@ -48,13 +48,13 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run migrate
-        run: python manage.py migrate
-
-      - name: Run tests
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/DB_Online_School
+        run: python manage.py migrate
+
+      - name: Run tests
         run: python manage.py test
 
   build:
