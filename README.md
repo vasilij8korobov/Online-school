@@ -40,3 +40,15 @@ Redis	        6379	    redis:6379 (внутри сети)
     docker-compose logs -f [service_name]
 * Запуск тестов:
     docker-compose exec web python manage.py test
+
+## Развертывание на сервере (CI/CD)
+1. При пуше в ветку `main` или `develop` автоматически запускается:
+   - Тестирование (`flake8`, `pytest`).
+   - Сборка Docker-образа.
+   - Деплой на сервер через SSH.
+2. Требуемые secrets в GitHub:
+   - `DOCKERHUB_USERNAME` — логин Docker Hub.
+   - `DOCKERHUB_TOKEN` — токен Docker Hub.
+   - `SSH_KEY` — приватный ключ для доступа к серверу.
+   - `SSH_USER` — пользователь сервера (например, `vasiliy`).
+   - `SERVER_IP` — IP сервера (51.250.99.83).
