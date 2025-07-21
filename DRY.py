@@ -1,5 +1,3 @@
-from itertools import count
-
 from django.conf import settings
 NULLABLE = {'blank': True, 'null': True}
 
@@ -183,5 +181,3 @@ User = settings.AUTH_USER_MODEL
 #             user=self.user,
 #             course=self.course
 #         ).exists())
-
-
