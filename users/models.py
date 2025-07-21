@@ -30,7 +30,9 @@ class CustomUser(AbstractUser):
         'auth.Group',
         related_name='customuser_set',
         blank=True,
-        help_text='Группы, к которым принадлежит пользователь. Пользователь получит все разрешения, предоставленные каждой из его групп.',
+        help_text='Группы, к которым принадлежит пользователь. '
+		  ' Пользователь получит все разрешения, '
+		  ' предоставленные каждой из его групп.',
         verbose_name='Группы'
     )
     user_permissions = models.ManyToManyField(

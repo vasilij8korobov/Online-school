@@ -1,5 +1,4 @@
 from django.contrib import admin
-from users.models import CustomUser
 from .models import Course, Lesson, Subscription
 from django.utils import timezone
 from .tasks import send_update_notification
