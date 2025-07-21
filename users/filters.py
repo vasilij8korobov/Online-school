@@ -32,4 +32,3 @@ class PaymentFilter(django_filters.FilterSet):
     class Meta:
         model = Payment
         fields = ['course', 'lesson', 'payment_method']
-

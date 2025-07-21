@@ -99,4 +99,5 @@ jobs:
             -e "ENV_VAR=value" \
             ${{ secrets.DOCKERHUB_USERNAME }}/online-school:${{ github.sha }}
           EOF
+          
 

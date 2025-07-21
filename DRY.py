@@ -2,6 +2,7 @@ from django.conf import settings
 NULLABLE = {'blank': True, 'null': True}
 
 User = settings.AUTH_USER_MODEL
+# User = settings.AUTH_USER_MODEL
 # from django.urls import reverse
 # from rest_framework import status, serializers
 # from rest_framework.test import APITestCase
